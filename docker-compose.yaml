@@ -1,25 +1,41 @@
 version: '3'
 
 services:
-  goapp: 
-    build: .
+  nodeapp:
+    image: node:18-alpine
+    container_name: nodeapp
+    volumes:
+      - ./nodeapp:/app
+    working_dir: /app
+    restart: unless-stopped
+    platform: linux/amd64
+    ports:
+      - 3003:3003
+    entrypoint: sh -c "npm install && npm run dev"
+
+  goapp:
+    build: ./goapp
     platform: linux/amd64
     volumes:
-      - .:/app
+      - ./goapp:/app
+    entrypoint: sh -c "go run cmd/walletcore/main.go"
     ports:
       - 8080:8080
+    depends_on:
+      - gomysql
 
-  mysql:
-    image: mysql:5.7
+  gomysql:
+    build: ./goapp/data
+    command: --innodb-use-native-aio=0
     platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: wallet
-      MYSQL_PASSWORD: root
     ports:
       - 3306:3306
     volumes:
-      - .docker/mysql:/var/lib/mysql
+      - ./goapp/.docker/mysql:/var/lib/mysql
+      - ./goapp/data:/docker-entrypoint-initdb.d
 
   zookeeper:
     image: "confluentinc/cp-zookeeper:6.1.0"
@@ -37,9 +53,9 @@ services:
     depends_on:
       - zookeeper
     ports:
-    # Exposes 9092 for external connections to the broker
-    # Use kafka:29092 for connections internal on the docker network
-    # See https://rmoff.net/2018/08/02/kafka-listeners-explained/ for details
+      # Exposes 9092 for external connections to the broker
+      # Use kafka:29092 for connections internal on the docker network
+      # See https://rmoff.net/2018/08/02/kafka-listeners-explained/ for details
       - '9092:9092'
     environment:
       TZ: Sao_Paulo/Brazil
@@ -70,4 +86,3 @@ services:
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: 9021
-  
