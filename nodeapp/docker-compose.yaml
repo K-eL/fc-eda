@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  nodeapp:
+    build: .
+    container_name: nodeapp
+    working_dir: /app
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    platform: linux/amd64
+    ports:
+      - 3003:3003
+    entrypoint: dockerize -wait tcp://nodemysql:3306 -timeout 20s sh -c "npm install && npm run dev"
+
+  nodemysql:
+    build: ./data
+    command: --innodb-use-native-aio=0
+    container_name: nodemysql
+    restart: always
+    volumes:
+      - ./.docker/mysql:/var/lib/mysql
+      - ./data:/docker-entrypoint-initdb.d
+    tty: true
+    environment:
+      MYSQL_DATABASE: accountsdb
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"

@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS accounts;
+
+CREATE TABLE IF NOT EXISTS accounts (
+	client_id VARCHAR(255) PRIMARY KEY,
+	balance INT
+);
