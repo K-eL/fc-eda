@@ -6,7 +6,7 @@ export default class AccountSequelizeRepository implements AccountGateway {
 
 	async find(id: string): Promise<Account> {
 		const response = await AccountModel.findOne({
-			where: { client_id: id }
+			where: { clientId: id }
 		});
 
 		if (!response) {
@@ -14,7 +14,7 @@ export default class AccountSequelizeRepository implements AccountGateway {
 		}
 
 		return new Account({
-			clientId: response.client_id,
+			clientId: response.clientId,
 			balance: response.balance
 		});
 	}
@@ -22,19 +22,19 @@ export default class AccountSequelizeRepository implements AccountGateway {
 	async save(account: Account): Promise<void> {
 
 		const response = await AccountModel.findOne({
-			where: { client_id: account.clientId }
+			where: { clientId: account.clientId }
 		});
 
 		if (!response) {
 			await AccountModel.create({
-				client_id: account.clientId,
+				clientId: account.clientId,
 				balance: account.balance
 			});
 		} else {
 			await AccountModel.update({
 				balance: account.balance
 			}, {
-				where: { client_id: account.clientId }
+				where: { clientId: account.clientId }
 			});
 		}
 	}

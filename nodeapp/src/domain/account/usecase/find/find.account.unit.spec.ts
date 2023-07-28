@@ -6,11 +6,11 @@ const MockRepository = jest.fn(() => ({
 }));
 
 const input = {
-	id: '1'
+	clientId: '1'
 };
 
 const output = {
-	id: '1',
+	clientId: '1',
 	balance: 10,
 };
 
