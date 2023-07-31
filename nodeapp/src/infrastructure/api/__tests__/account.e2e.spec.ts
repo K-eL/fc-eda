@@ -1,16 +1,35 @@
-import Account from "../../../domain/account/entity/account";
+import { app } from "../express";
+import request from "supertest";
+import { Sequelize } from "sequelize-typescript";
 import AccountRepositoryFactory from "../../../domain/account/factory/account.repository.factory";
 import SaveAccountUseCase from "../../../domain/account/usecase/save/save.account.usecase";
-import { app, sequelize } from "../express";
-import request from "supertest";
+import sqlite3 from "sqlite3";
+import { AccountModel } from "../../../domain/account/repository/sequelize/account.model";
+
+const sequelize = new Sequelize({
+	dialect: "sqlite",
+	storage: ":memory:",
+	logging: false,
+	dialectModule: sqlite3
+});
+sequelize.addModels([AccountModel]);
 
 describe("E2E test for account", () => {
+
+	beforeAll(async () => {
+		await sequelize.sync({ force: true });
+	});
+
+	afterAll(async () => {
+		await sequelize.close();
+	});
+
 
 	it("should return the account with the specified client ID", async () => {
 		const usecase = new SaveAccountUseCase(AccountRepositoryFactory.create());
 		await usecase.execute({
 			clientId: "1",
-			balance: 100
+			balance: 444
 		});
 
 		const jsonResponse = await request(app)

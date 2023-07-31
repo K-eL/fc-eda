@@ -1,10 +1,11 @@
 export const dbConfig = {
 	HOST: "nodemysql",
-	DB: "accountsdb",
+	DATABASE: "accountsdb",
 	USER: "root",
 	PASSWORD: "root",
 	dialect: "mysql",
 	logging: false,
+	port: 3306,
 	pool: {
 		max: 5,
 		min: 0,
